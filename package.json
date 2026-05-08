@@ -1,0 +1,32 @@
+{
+  "name": "fullstack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "cookie": "^1.1.1",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-router": "^7.14.2",
+    "react-router-dom": "^7.14.2",
+    "scheduler": "^0.27.0",
+    "set-cookie-parser": "^2.7.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
+    "start": "npm run start --prefix backend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hoangphuc210105/Todo---NodeJS---React.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/hoangphuc210105/Todo---NodeJS---React/issues"
+  },
+  "homepage": "https://github.com/hoangphuc210105/Todo---NodeJS---React#readme"
+}
