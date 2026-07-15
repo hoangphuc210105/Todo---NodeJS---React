@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import api from "@/lib/axios";
 import { visibleTaskLimit } from "@/lib/data";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 
 const HomePage = () => {
   const [taskBuffer, setTaskBuffer] = useState([]);
@@ -19,6 +20,23 @@ const HomePage = () => {
 
   useEffect(() => {
     fetchTasks();
+
+    // Thiết lập Supabase Realtime subscription
+    const channel = supabase
+      .channel("tasks-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "tasks" },
+        () => {
+          fetchTasks();
+        }
+      )
+      .subscribe();
+
+    // Hủy subscription khi component bị unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
