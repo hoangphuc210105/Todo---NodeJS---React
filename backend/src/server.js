@@ -29,5 +29,3 @@ app.listen(PORT, () => {
     console.log(`Server bắt đầu trên cổng ${PORT}...`)
 });
 
-export default app;
-
