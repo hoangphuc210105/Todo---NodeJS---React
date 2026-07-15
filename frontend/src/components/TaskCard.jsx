@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { toast } from "sonner";
-import api from "@/lib/axios";
+import { supabase } from "@/lib/supabase";
 import { useState } from "react";
 
 const TaskCard = ({ task, index, handleTaskChanged }) => {
@@ -24,7 +24,13 @@ const TaskCard = ({ task, index, handleTaskChanged }) => {
 
   const deleteTask = async (taskId) => {
     try {
-      await api.delete(`/test/${taskId}`);
+      const { error } = await supabase
+        .from("tasks")
+        .delete()
+        .eq("id", taskId);
+
+      if (error) throw error;
+
       toast.success("Nhiệm vụ đã xóa.");
       handleTaskChanged();
     } catch (error) {
@@ -36,9 +42,13 @@ const TaskCard = ({ task, index, handleTaskChanged }) => {
   const updateTask = async () => {
     try {
       setIsEditing(false);
-      await api.put(`/test/${task._id}`, {
-        title: updateTaskTitle,
-      });
+      const { error } = await supabase
+        .from("tasks")
+        .update({ title: updateTaskTitle })
+        .eq("id", task._id);
+
+      if (error) throw error;
+
       toast.success(`Nhiệm vụ đã đổi thành ${updateTaskTitle}`);
       handleTaskChanged();
     } catch (error) {
@@ -49,17 +59,20 @@ const TaskCard = ({ task, index, handleTaskChanged }) => {
 
   const toggleTaskCompleteButton = async () => {
     try {
-      if (task.status === "active") {
-        await api.put(`/test/${task._id}`, {
-          status: "completed",
-          completeAt: new Date().toISOString(),
-        });
+      const isCompleted = task.status === "active";
+      const { error } = await supabase
+        .from("tasks")
+        .update({
+          status: isCompleted ? "completed" : "active",
+          completeAt: isCompleted ? new Date().toISOString() : null,
+        })
+        .eq("id", task._id);
+
+      if (error) throw error;
+
+      if (isCompleted) {
         toast.success(`${task.title} đã hoàn thành`);
       } else {
-        await api.put(`/test/${task._id}`, {
-          status: "active",
-          completeAt: null,
-        });
         toast.success(`${task.title} đã đổi sang chưa hoàn thành`);
       }
       handleTaskChanged();

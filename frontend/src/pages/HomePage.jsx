@@ -63,8 +63,18 @@ const HomePage = () => {
 
   const fetchTasks = async () => {
     try {
-      const res = await api.get("/test");
-      setTaskBuffer(res.data.tasks);
+      const { data, error } = await supabase
+        .from("tasks")
+        .select("*")
+        .order("createdAt", { ascending: false });
+
+      if (error) throw error;
+
+      const mappedTasks = (data || []).map((task) => ({
+        ...task,
+        _id: task.id,
+      }));
+      setTaskBuffer(mappedTasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);
       toast.error("Lỗi xảy ra khi truy xuất tasks");
