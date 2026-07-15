@@ -1,6 +1,5 @@
 import express from "express";
 import testRoutes from "./routes/testRoutes.js";
-import { connectDB } from "./config/db.js";
 import dotenv from "dotenv";
 import cors from "cors";
 import path, { join } from "path";
@@ -28,9 +27,9 @@ if (process.env.NODE_ENV === "production") {
     })
 }
 
-connectDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server bắt đầu trên cổng ${PORT}...`)
-    });
-})
+app.listen(PORT, () => {
+    console.log(`Server bắt đầu trên cổng ${PORT}...`)
+});
+
+export default app;
 
