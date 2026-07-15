@@ -12,14 +12,7 @@ const app = express();
 
 //Middlewares
 app.use(express.json());
-if (process.env.NODE_ENV !== "production") {
-    app.use(cors({ origin: "http://localhost:5173" }));
-} else {
-    app.use(cors({
-        origin: process.env.FRONTEND_URL || "*",
-        credentials: true
-    }));
-}
+app.use(cors());
 
 app.use(express.json());
 app.use("/api/test", testRoutes);
