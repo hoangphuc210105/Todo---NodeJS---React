@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
+import api from "@/lib/axios";
 import { useState } from "react";
 
 const TaskCard = ({ task, index, handleTaskChanged }) => {
@@ -24,15 +24,9 @@ const TaskCard = ({ task, index, handleTaskChanged }) => {
 
   const deleteTask = async (taskId) => {
     try {
-      const { error } = await supabase
-        .from("tasks")
-        .delete()
-        .eq("id", taskId);
-
-      if (error) throw error;
-
+      await api.delete(`/test/${taskId}`);
       toast.success("Nhiệm vụ đã xóa.");
-      handleTaskChanged();
+      handleTaskChanged("delete", taskId);
     } catch (error) {
       console.log("Lỗi xảy ra khi xóa Task." + error);
       toast.error("Lỗi xảy ra khi xóa Task.");
@@ -42,15 +36,11 @@ const TaskCard = ({ task, index, handleTaskChanged }) => {
   const updateTask = async () => {
     try {
       setIsEditing(false);
-      const { error } = await supabase
-        .from("tasks")
-        .update({ title: updateTaskTitle })
-        .eq("id", task._id);
-
-      if (error) throw error;
-
+      const res = await api.put(`/test/${task._id}`, {
+        title: updateTaskTitle,
+      });
       toast.success(`Nhiệm vụ đã đổi thành ${updateTaskTitle}`);
-      handleTaskChanged();
+      handleTaskChanged("update", res.data);
     } catch (error) {
       console.log("Lỗi xảy ra khi update Task." + error);
       toast.error("Lỗi xảy ra khi cập nhật Task.");
@@ -59,23 +49,21 @@ const TaskCard = ({ task, index, handleTaskChanged }) => {
 
   const toggleTaskCompleteButton = async () => {
     try {
-      const isCompleted = task.status === "active";
-      const { error } = await supabase
-        .from("tasks")
-        .update({
-          status: isCompleted ? "completed" : "active",
-          completeAt: isCompleted ? new Date().toISOString() : null,
-        })
-        .eq("id", task._id);
-
-      if (error) throw error;
-
-      if (isCompleted) {
+      let res;
+      if (task.status === "active") {
+        res = await api.put(`/test/${task._id}`, {
+          status: "completed",
+          completeAt: new Date().toISOString(),
+        });
         toast.success(`${task.title} đã hoàn thành`);
       } else {
+        res = await api.put(`/test/${task._id}`, {
+          status: "active",
+          completeAt: null,
+        });
         toast.success(`${task.title} đã đổi sang chưa hoàn thành`);
       }
-      handleTaskChanged();
+      handleTaskChanged("update", res.data);
     } catch (error) {
       console.log("Lỗi xảy ra khi thay đổi Task." + error);
       toast.error("Lỗi xảy ra khi thay đổi Task");

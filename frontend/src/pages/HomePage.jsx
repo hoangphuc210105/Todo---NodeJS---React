@@ -63,27 +63,27 @@ const HomePage = () => {
 
   const fetchTasks = async () => {
     try {
-      const { data, error } = await supabase
-        .from("tasks")
-        .select("*")
-        .order("createdAt", { ascending: false });
-
-      if (error) throw error;
-
-      const mappedTasks = (data || []).map((task) => ({
-        ...task,
-        _id: task.id,
-      }));
-      setTaskBuffer(mappedTasks);
+      const res = await api.get("/test");
+      setTaskBuffer(res.data.tasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);
       toast.error("Lỗi xảy ra khi truy xuất tasks");
     }
   };
 
-  const handleTaskChanged = () => {
-    // No-op because Supabase Realtime will automatically catch the DB changes
-    // and update local state in real-time.
+  const handleTaskChanged = (action, payload) => {
+    if (action === "add") {
+      setTaskBuffer((prev) => {
+        if (prev.some((t) => t._id === payload._id)) return prev;
+        return [payload, ...prev];
+      });
+    } else if (action === "update") {
+      setTaskBuffer((prev) =>
+        prev.map((t) => (t._id === payload._id ? payload : t))
+      );
+    } else if (action === "delete") {
+      setTaskBuffer((prev) => prev.filter((t) => t._id !== payload));
+    }
   };
 
   const handleNext = () => {

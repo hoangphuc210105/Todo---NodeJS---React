@@ -4,21 +4,16 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
+import api from "@/lib/axios";
 
 const AddTask = ({ handleNewTaskAdd }) => {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const addTasks = async () => {
     if (newTaskTitle.trim()) {
       try {
-        const { error } = await supabase
-          .from("tasks")
-          .insert([{ title: newTaskTitle, status: "active" }]);
-
-        if (error) throw error;
-
+        const res = await api.post("/test", { title: newTaskTitle });
         toast.success(` Nhiệm vụ ${newTaskTitle} đã được thêm vào `);
-        handleNewTaskAdd();
+        handleNewTaskAdd("add", res.data);
       } catch (error) {
         console.error(error);
         toast.error("Lỗi xảy ra khi thêm nhiệm vụ mới.");
